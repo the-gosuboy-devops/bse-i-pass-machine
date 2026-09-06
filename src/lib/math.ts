@@ -140,3 +140,37 @@ export function parseList(raw: string): number[] {
     .map(Number)
     .filter((n) => Number.isFinite(n));
 }
+
+/** Excel PERCENTILE.EXC: L_p = (p/100)(n+1), 1-indexed, interpolate if not integer. */
+export function percentileAt(xs: number[], p: number) {
+  const sorted = [...xs].sort((a, b) => a - b);
+  const n = sorted.length;
+  const Lp = (p / 100) * (n + 1);
+  if (n === 0 || !Number.isFinite(Lp)) {
+    return { sorted, n, Lp, value: NaN, method: "exact" as const, lo: 1, hi: 1, frac: 0 };
+  }
+  if (Lp <= 1) {
+    return { sorted, n, Lp, value: sorted[0], method: "exact" as const, lo: 1, hi: 1, frac: 0 };
+  }
+  if (Lp >= n) {
+    return { sorted, n, Lp, value: sorted[n - 1], method: "exact" as const, lo: n, hi: n, frac: 0 };
+  }
+  const lo = Math.floor(Lp);
+  const frac = Lp - lo;
+  if (frac < 1e-12) {
+    return { sorted, n, Lp, value: sorted[lo - 1], method: "exact" as const, lo, hi: lo, frac: 0 };
+  }
+  const a = sorted[lo - 1];
+  const b = sorted[lo];
+  return {
+    sorted,
+    n,
+    Lp,
+    value: a + frac * (b - a),
+    method: "lerp" as const,
+    lo,
+    hi: lo + 1,
+    frac,
+  };
+}
+

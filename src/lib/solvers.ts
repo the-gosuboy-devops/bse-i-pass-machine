@@ -7,6 +7,7 @@ import {
   median,
   modes,
   parseList,
+  percentileAt,
   poissonCdf,
   poissonPmf,
   round,
@@ -33,6 +34,21 @@ export type Solver = {
 function num(v: Record<string, string>, key: string): number {
   const n = Number(String(v[key] ?? "").replace(/,/g, "").trim());
   return n;
+}
+
+function ord(n: number): string {
+  const m = n % 100;
+  if (m >= 11 && m <= 13) return "th";
+  switch (n % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
 }
 
 export const SOLVERS: Solver[] = [
@@ -141,6 +157,47 @@ export const SOLVERS: Solver[] = [
         `Whiskers stop at the last point inside the fences. Anything outside is plotted as an outlier.`,
       ];
       return { steps, answer: `IQR = ${fmt(iqr)}  ·  fences (${fmt(lo)}, ${fmt(hi)})` };
+    },
+  },
+  {
+    id: "percentile",
+    name: "Percentile · quartiles",
+    blurb: "L_p = (p/100)(n+1). Interpolate when the location is not a whole number. Excel PERCENTILE.EXC.",
+    fields: [
+      {
+        kind: "text",
+        key: "data",
+        label: "Sorted or unsorted numbers",
+        def: "6, 7, 8, 10, 12, 14, 15, 18, 20",
+      },
+      { kind: "num", key: "p", label: "Percentile p (e.g. 25, 40, 75)", def: "25" },
+    ],
+    run: (v) => {
+      const xs = parseList(v.data ?? "");
+      const p = num(v, "p");
+      if (xs.length < 1) return { steps: [], answer: "", error: "Need at least one number." };
+      if (p <= 0 || p >= 100) return { steps: [], answer: "", error: "p must be between 0 and 100, exclusive." };
+      const r = percentileAt(xs, p);
+      const q1 = percentileAt(xs, 25);
+      const q2 = percentileAt(xs, 50);
+      const q3 = percentileAt(xs, 75);
+      const iqr = q3.value - q1.value;
+      const loF = q1.value - 1.5 * iqr;
+      const hiF = q3.value + 1.5 * iqr;
+      const steps = [
+        `Sorted (n = ${r.n}): ${r.sorted.join(", ")}`,
+        `L_p = (p/100)(n + 1) = (${fmt(p)}/100)×${r.n + 1} = ${fmt(r.Lp, 3)}`,
+        r.method === "exact"
+          ? `L_p is a whole number, so the ${r.lo}${ord(r.lo)} sorted value = ${fmt(r.value)}`
+          : `Between the ${r.lo}${ord(r.lo)} value (${fmt(r.sorted[r.lo - 1])}) and the ${r.hi}${ord(r.hi)} (${fmt(r.sorted[r.hi - 1])}). Interpolate: ${fmt(r.sorted[r.lo - 1])} + ${fmt(r.frac, 3)}×(${fmt(r.sorted[r.hi - 1])} − ${fmt(r.sorted[r.lo - 1])}) = ${fmt(r.value)}`,
+        `Q1 (25th) = ${fmt(q1.value)}    Q2 / median (50th) = ${fmt(q2.value)}    Q3 (75th) = ${fmt(q3.value)}`,
+        `IQR = ${fmt(iqr)}    fences (${fmt(loF)}, ${fmt(hiF)})`,
+        `Five-number summary: ${fmt(r.sorted[0])}, ${fmt(q1.value)}, ${fmt(q2.value)}, ${fmt(q3.value)}, ${fmt(r.sorted[r.n - 1])}`,
+      ];
+      return {
+        steps,
+        answer: `${fmt(p)}th percentile = ${fmt(r.value)}  ·  IQR ${fmt(iqr)}`,
+      };
     },
   },
   {

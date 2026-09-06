@@ -14,6 +14,7 @@ export const FORMULA_GROUPS: FormulaGroup[] = [
       { name: "Mean", formula: "x̄ = (Σ xᵢ) / n" },
       { name: "Weighted mean", formula: "(Σ wᵢ xᵢ) / (Σ wᵢ)" },
       { name: "Percentile location", formula: "L_p = (p/100)(n + 1)" },
+      { name: "Percentile interpolate", formula: "if L_p = k + d:  x_(k) + d(x_(k+1) − x_(k))" },
       { name: "IQR", formula: "Q3 − Q1" },
       { name: "Sample variance", formula: "s² = Σ(xᵢ − x̄)² / (n − 1)" },
       { name: "Sample SD", formula: "s = √s²" },
