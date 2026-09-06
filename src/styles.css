@@ -1,0 +1,106 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --color-cream: #fff8f0;
+  --color-cream-deep: #faefe0;
+  --color-paper: #fffbf5;
+  --color-ink: #2d2a26;
+  --color-ink-soft: #5c544a;
+  --color-line: #e8dfd0;
+  --color-mint: #c9e8d2;
+  --color-mint-deep: #8fd0a3;
+  --color-peach: #ffd4b8;
+  --color-peach-deep: #ffb088;
+  --color-lilac: #dcc9f7;
+  --color-lilac-deep: #b89ce8;
+  --color-sky: #c2dfff;
+  --color-sky-deep: #8bbff5;
+  --color-butter: #fff0a8;
+  --color-butter-deep: #f5d970;
+  --color-coral: #ff9b95;
+  --color-coral-deep: #ff7a72;
+  --color-good: #4faa68;
+  --color-good-bg: #dff3e4;
+  --color-bad: #d9534f;
+  --color-bad-bg: #fbe4e3;
+  --color-tip: #fffbe9;
+  --color-example: #e8f4ff;
+  --color-formula: #f1ecfa;
+  --color-trap: #fbe4e3;
+
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 22px;
+  --radius-2xl: 28px;
+
+  --shadow-sm: 0 1px 2px rgb(45 42 38 / 0.06), 0 2px 4px rgb(45 42 38 / 0.04);
+  --shadow-md: 0 4px 12px rgb(45 42 38 / 0.08), 0 8px 24px rgb(45 42 38 / 0.05);
+  --shadow-lg: 0 12px 32px rgb(45 42 38 / 0.1), 0 24px 48px rgb(45 42 38 / 0.06);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.65;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(at 12% 8%, rgb(220 201 247 / 0.35) 0, transparent 50%),
+      radial-gradient(at 88% 14%, rgb(194 223 255 / 0.3) 0, transparent 45%),
+      radial-gradient(at 92% 78%, rgb(255 212 184 / 0.3) 0, transparent 50%),
+      radial-gradient(at 6% 92%, rgb(201 232 210 / 0.35) 0, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: var(--color-butter);
+    color: var(--color-ink);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
